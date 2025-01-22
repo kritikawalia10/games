@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rock Paper Scissors</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+    }
+    .button-container button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #scoreboard {
+      margin: 20px;
+      font-size: 20px;
+    }
+    .highlight {
+      animation: highlight 1s ease-in-out;
+    }
+    @keyframes highlight {
+      from {
+        background-color: yellow;
+      }
+      to {
+        background-color: transparent;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Rock Paper Scissors</h1>
+  <div class="button-container">
+    <button onclick="playGame('Rock')">Rock</button>
+    <button onclick="playGame('Paper')">Paper</button>
+    <button onclick="playGame('Scissors')">Scissors</button>
+  </div>
+
+  <div id="scoreboard">
+    Player: <span id="player-score">0</span> - Computer: <span id="computer-score">0</span>
+  </div>
+
+  <div id="result-display">
+    <p>Player chose: <span id="player-choice"></span></p>
+    <p>Computer chose: <span id="computer-choice"></span></p>
+    <p>Result: <span id="result"></span></p>
+  </div>
+
+  <button id="reset" onclick="resetGame()">Reset</button>
+
+  <script>
+    let playerScore = 0;
+    let computerScore = 0;
+
+    function playGame(playerChoice) {
+      const choices = ["Rock", "Paper", "Scissors"];
+      const computerChoice = choices[Math.floor(Math.random() * 3)];
+
+      let result = "";
+      if (playerChoice === computerChoice) {
+        result = "It's a tie!";
+      } else if (
+        (playerChoice === "Rock" && computerChoice === "Scissors") ||
+        (playerChoice === "Paper" && computerChoice === "Rock") ||
+        (playerChoice === "Scissors" && computerChoice === "Paper")
+      ) {
+        result = "You win!";
+        playerScore++;
+      } else {
+        result = "Computer wins!";
+        computerScore++;
+      }
+
+      // Update the UI
+      document.getElementById("player-choice").textContent = playerChoice;
+      document.getElementById("computer-choice").textContent = computerChoice;
+      document.getElementById("result").textContent = result;
+
+      document.getElementById("player-score").textContent = playerScore;
+      document.getElementById("computer-score").textContent = computerScore;
+
+      // Highlight the result
+      document.getElementById("result").classList.add("highlight");
+      setTimeout(() => {
+        document.getElementById("result").classList.remove("highlight");
+      }, 1000);
+    }
+
+    function resetGame() {
+      playerScore = 0;
+      computerScore = 0;
+
+      document.getElementById("player-score").textContent = 0;
+      document.getElementById("computer-score").textContent = 0;
+
+      document.getElementById("player-choice").textContent = "";
+      document.getElementById("computer-choice").textContent = "";
+      document.getElementById("result").textContent = "";
+    }
+  </script>
+</body>
+</html>

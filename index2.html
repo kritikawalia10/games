@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      grid-gap: 10px;
+      justify-content: center;
+    }
+
+    .card {
+      width: 100px;
+      height: 100px;
+      background-color: #ccc;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .card img {
+      width: 100%;
+      height: 100%;
+      display: none; /* Initially hidden */
+    }
+
+    .card.flipped img {
+      display: block; /* Shown when flipped */
+    }
+  </style>
+</head>
+<body>
+  <h1>Memory Game</h1>
+  <p>Score: <span id="score">0</span></p>
+  <div id="grid"></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const cards = [
+        { name: "apple", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgwL-h1Cn63ReEOujy9nt-mvu34yGszMsTJw&s" },
+        { name: "apple", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgwL-h1Cn63ReEOujy9nt-mvu34yGszMsTJw&s" },
+        { name: "banana", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlx0r1O5yAEDbejufR_PdCXVckyGdD-8F4WA&s"},
+        { name: "banana", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlx0r1O5yAEDbejufR_PdCXVckyGdD-8F4WA&s" },
+        { name: "cherry", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQeNxNE3kIrKNzcIxzcTp24wT46BDono9PYw&s" },
+        { name: "cherry", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQeNxNE3kIrKNzcIxzcTp24wT46BDono9PYw&s" },
+        { name: "grape", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSA79il592dciniUFuH0m4hW_OwyyLj2rxiA&s" },
+        { name: "grape", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSA79il592dciniUFuH0m4hW_OwyyLj2rxiA&s" }
+      ];
+
+      cards.sort(() => 0.5 - Math.random()); // Shuffle cards
+
+      const grid = document.querySelector("#grid");
+      const scoreDisplay = document.querySelector("#score");
+      let score = 0;
+      let chosenCards = [];
+      let chosenCardIds = [];
+
+      // Create game board
+      function createBoard() {
+        cards.forEach((card, index) => {
+          const cardElement = document.createElement("div");
+          cardElement.classList.add("card");
+          cardElement.setAttribute("data-id", index);
+
+          const cardImage = document.createElement("img");
+          cardImage.setAttribute("src", card.img);
+
+          cardElement.appendChild(cardImage);
+          grid.appendChild(cardElement);
+
+          cardElement.addEventListener("click", flipCard);
+        });
+      }
+
+      // Flip the card
+      function flipCard() {
+        const cardId = this.getAttribute("data-id");
+        if (!chosenCardIds.includes(cardId)) {
+          chosenCards.push(cards[cardId]);
+          chosenCardIds.push(cardId);
+          this.classList.add("flipped");
+          this.querySelector("img").style.display = "block";
+
+          if (chosenCards.length === 2) {
+            setTimeout(checkMatch, 1000);
+          }
+        }
+      }
+
+      // Check for matches
+      function checkMatch() {
+        const cardsInPlay = document.querySelectorAll(".flipped");
+
+        if (chosenCards[0].name === chosenCards[1].name) {
+          alert("Match Found!");
+          score++;
+          scoreDisplay.textContent = score;
+
+          // Remove matched cards
+          cardsInPlay.forEach(card => card.removeEventListener("click", flipCard));
+        } else {
+          alert("No Match!");
+          cardsInPlay.forEach(card => {
+            card.classList.remove("flipped");
+            card.querySelector("img").style.display = "none";
+          });
+        }
+
+        chosenCards = [];
+        chosenCardIds = [];
+
+        // Check win condition
+        if (score === cards.length / 2) {
+          alert("Congratulations! You found all matches!");
+        }
+      }
+
+      createBoard();
+    });
+  </script>
+</body>
+</html>
