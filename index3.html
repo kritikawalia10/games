@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Whac-a-mole</title>
+  <style>
+    .grid{
+      width: 600px;
+      height: 600px;
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .square{
+      height: 200px;
+      width: 200px;
+      border: solid black 1px;
+    }
+    .mole{
+      background-color: blue;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Your score: <span id="score">0</span></h2>
+  <h2>Time Left: <span id="time-left">60</span></h2>
+  <div class="grid">
+    <div class="square" id="1"></div>
+    <div class="square" id="2"></div>
+    <div class="square" id="3"></div>
+    <div class="square" id="4"></div>
+    <div class="square" id="5"></div>
+    <div class="square" id="6"></div>
+    <div class="square" id="7"></div>
+    <div class="square" id="8"></div>
+    <div class="square" id="9"></div>
+    
+  </div>
+  
+
+  <script>
+    const squares = document.querySelectorAll('.square');
+const mole = document.querySelector('.mole');
+const timeLeft = document.querySelector('#time-left');
+const score = document.querySelector('#score');
+
+let result = 0;
+let hitPosition;
+let currentTime = 60;
+let timerId = null;
+
+function randomSquare() {
+  squares.forEach(square => {
+    square.classList.remove('mole');
+  });
+
+  let randomSquare = squares[Math.floor(Math.random() * 9)];
+  randomSquare.classList.add('mole');
+  hitPosition = randomSquare.id;
+}
+squares.forEach(square => {
+  square.addEventListener('mousedown', () => {
+    if (square.id == hitPosition) {
+      result++;
+      score.textContent = result;
+      hitPosition = null;
+    }
+  });
+});
+
+function moveMole() {
+  timerId = setInterval(randomSquare, 500);
+}
+
+moveMole();
+
+function countDown() {
+  currentTime--;
+  timeLeft.textContent = currentTime;
+
+  if (currentTime == 0) {
+    clearInterval(countDownTimerId);
+    clearInterval(timerId);
+    alert('GAME OVER! Your final score is ' + result);
+  }
+}
+
+let countDownTimerId = setInterval(countDown, 1000);
+  </script>
+</body>
+</html>
