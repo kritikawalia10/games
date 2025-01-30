@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect Four</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f5f5f5;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(7, 60px);
+      grid-template-rows: repeat(6, 60px);
+      gap: 5px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .square {
+      width: 60px;
+      height: 60px;
+      background-color: #dcdcdc;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .square.player-one {
+      background-color: #e74c3c;
+    }
+
+    .square.player-two {
+      background-color: #f39c12;
+    }
+
+    .scoreboard {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin: 20px 0;
+      font-size: 1.2rem;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .current-player {
+      font-size: 1.5rem;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Connect Four</h1>
+  <div class="current-player">Current Player: <span id="player">1</span></div>
+  
+  <div class="scoreboard">
+    <p>Player 1: <span id="player-one-score">0</span></p>
+    <p>Player 2: <span id="player-two-score">0</span></p>
+  </div>
+
+  <div class="grid"></div>
+
+  <button id="reset">Reset Game</button>
+
+  <script>
+    const grid = document.querySelector('.grid');
+    const playerDisplay = document.getElementById('player');
+    const resetButton = document.getElementById('reset');
+    const playerOneScoreDisplay = document.getElementById('player-one-score');
+    const playerTwoScoreDisplay = document.getElementById('player-two-score');
+    const columns = 7;
+    const rows = 6;
+    const winningLength = 4;
+
+    let currentPlayer = 1;
+    let playerOneScore = 0;
+    let playerTwoScore = 0;
+    let gameOver = false;
+
+    // Create the game board
+    const squares = [];
+    for (let i = 0; i < rows * columns; i++) {
+      const square = document.createElement('div');
+      square.classList.add('square');
+      grid.appendChild(square);
+      squares.push(square);
+    }
+
+    // Handle square click
+    function handleSquareClick(index) {
+      if (gameOver) return;
+
+      const column = index % columns;
+
+      for (let row = rows - 1; row >= 0; row--) {
+        const squareIndex = row * columns + column;
+        if (!squares[squareIndex].classList.contains('player-one') && !squares[squareIndex].classList.contains('player-two')) {
+          squares[squareIndex].classList.add(currentPlayer === 1 ? 'player-one' : 'player-two');
+          checkWin();
+          currentPlayer = currentPlayer === 1 ? 2 : 1;
+          playerDisplay.textContent = `Player ${currentPlayer}`;
+          break;
+        }
+      }
+    }
+
+    squares.forEach((square, index) => {
+      square.addEventListener('click', () => handleSquareClick(index));
+    });
+
+    // Check for win
+    function checkWin() {
+      const winningArrays = [
+        ...getWinningCombinations('horizontal'),
+        ...getWinningCombinations('vertical'),
+        ...getWinningCombinations('diagonal')
+      ];
+
+      for (const combination of winningArrays) {
+        const [a, b, c, d] = combination;
+        if (
+          squares[a].classList.contains('player-one') &&
+          squares[b].classList.contains('player-one') &&
+          squares[c].classList.contains('player-one') &&
+          squares[d].classList.contains('player-one')
+        ) {
+          alert('Player One Wins!');
+          playerOneScore++;
+          updateScores();
+          gameOver = true;
+          resetBoard();
+          return;
+        }
+        if (
+          squares[a].classList.contains('player-two') &&
+          squares[b].classList.contains('player-two') &&
+          squares[c].classList.contains('player-two') &&
+          squares[d].classList.contains('player-two')
+        ) {
+          alert('Player Two Wins!');
+          playerTwoScore++;
+          updateScores();
+          gameOver = true;
+          resetBoard();
+          return;
+        }
+      }
+    }
+
+    function getWinningCombinations(direction) {
+      const combinations = [];
+      if (direction === 'horizontal') {
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col <= columns - winningLength; col++) {
+            const combination = [];
+            for (let i = 0; i < winningLength; i++) {
+              combination.push(row * columns + col + i);
+            }
+            combinations.push(combination);
+          }
+        }
+      }
+
+      if (direction === 'vertical') {
+        for (let col = 0; col < columns; col++) {
+          for (let row = 0; row <= rows - winningLength; row++) {
+            const combination = [];
+            for (let i = 0; i < winningLength; i++) {
+              combination.push((row + i) * columns + col);
+            }
+            combinations.push(combination);
+          }
+        }
+      }
+
+      if (direction === 'diagonal') {
+        for (let row = 0; row <= rows - winningLength; row++) {
+          for (let col = 0; col <= columns - winningLength; col++) {
+            const combination1 = [];
+            const combination2 = [];
+            for (let i = 0; i < winningLength; i++) {
+              combination1.push((row + i) * columns + (col + i));
+              combination2.push((row + i) * columns + (col + winningLength - 1 - i));
+            }
+            combinations.push(combination1);
+            combinations.push(combination2);
+          }
+        }
+      }
+
+      return combinations;
+    }
+
+    // Update scores
+    function updateScores() {
+      playerOneScoreDisplay.textContent = playerOneScore;
+      playerTwoScoreDisplay.textContent = playerTwoScore;
+    }
+
+    // Reset the board
+    function resetBoard() {
+      squares.forEach(square => {
+        square.classList.remove('player-one', 'player-two');
+      });
+      gameOver = false;
+      currentPlayer = 1;
+      playerDisplay.textContent = `Player ${currentPlayer}`;
+    }
+
+    // Reset game
+    resetButton.addEventListener('click', () => {
+      playerOneScore = 0;
+      playerTwoScore = 0;
+      updateScores();
+      resetBoard();
+    });
+
+  </script>
+
+</body>
+</html>
