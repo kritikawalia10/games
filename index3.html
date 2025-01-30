@@ -3,90 +3,181 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Whac-a-mole</title>
+  <title>Whac-a-Mole</title>
   <style>
-    .grid{
-      width: 600px;
-      height: 600px;
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    h2 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .grid {
+      width: 450px;
+      height: 450px;
       display: flex;
       flex-wrap: wrap;
+      justify-content: center;
+      margin: 20px auto;
+      padding: 10px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
     }
-    .square{
-      height: 200px;
-      width: 200px;
-      border: solid black 1px;
+
+    .square {
+      height: 140px;
+      width: 140px;
+      border: solid black 2px;
+      border-radius: 8px;
+      transition: 0.2s;
+      background: #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .mole{
-      background-color: blue;
+
+    .square:hover {
+      background: #ddd;
+      cursor: pointer;
+    }
+
+    .mole {
+      background: #4a90e2;
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+      animation: pop 0.3s ease-in-out;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0); }
+      100% { transform: scale(1); }
+    }
+
+    #score, #time-left {
+      font-weight: bold;
+      color: #e44d26;
+    }
+
+    #game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 30px;
+    }
+
+    .level-buttons {
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 15px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    .easy { background: green; color: white; }
+    .medium { background: orange; color: white; }
+    .hard { background: red; color: white; }
+    
+    button:hover {
+      opacity: 0.8;
     }
   </style>
 </head>
 <body>
 
-  <h2>Your score: <span id="score">0</span></h2>
-  <h2>Time Left: <span id="time-left">60</span></h2>
-  <div class="grid">
-    <div class="square" id="1"></div>
-    <div class="square" id="2"></div>
-    <div class="square" id="3"></div>
-    <div class="square" id="4"></div>
-    <div class="square" id="5"></div>
-    <div class="square" id="6"></div>
-    <div class="square" id="7"></div>
-    <div class="square" id="8"></div>
-    <div class="square" id="9"></div>
-    
+  <div id="game-container">
+    <h2>Your score: <span id="score">0</span></h2>
+    <h2>Time Left: <span id="time-left">60</span></h2>
+
+    <div class="level-buttons">
+      <button class="easy" onclick="startGame(1000)">Easy</button>
+      <button class="medium" onclick="startGame(600)">Medium</button>
+      <button class="hard" onclick="startGame(400)">Hard</button>
+    </div>
+
+    <div class="grid">
+      <div class="square" id="1"></div>
+      <div class="square" id="2"></div>
+      <div class="square" id="3"></div>
+      <div class="square" id="4"></div>
+      <div class="square" id="5"></div>
+      <div class="square" id="6"></div>
+      <div class="square" id="7"></div>
+      <div class="square" id="8"></div>
+      <div class="square" id="9"></div>
+    </div>
   </div>
-  
 
   <script>
     const squares = document.querySelectorAll('.square');
-const mole = document.querySelector('.mole');
-const timeLeft = document.querySelector('#time-left');
-const score = document.querySelector('#score');
+    const score = document.querySelector('#score');
+    const timeLeft = document.querySelector('#time-left');
 
-let result = 0;
-let hitPosition;
-let currentTime = 60;
-let timerId = null;
+    let result = 0;
+    let hitPosition;
+    let currentTime = 60;
+    let moleSpeed;
+    let moleTimer;
+    let countDownTimerId;
 
-function randomSquare() {
-  squares.forEach(square => {
-    square.classList.remove('mole');
-  });
+    function randomSquare() {
+      squares.forEach(square => {
+        square.classList.remove('mole');
+      });
 
-  let randomSquare = squares[Math.floor(Math.random() * 9)];
-  randomSquare.classList.add('mole');
-  hitPosition = randomSquare.id;
-}
-squares.forEach(square => {
-  square.addEventListener('mousedown', () => {
-    if (square.id == hitPosition) {
-      result++;
-      score.textContent = result;
-      hitPosition = null;
+      let randomSquare = squares[Math.floor(Math.random() * squares.length)];
+      randomSquare.classList.add('mole');
+      hitPosition = randomSquare.id;
     }
-  });
-});
 
-function moveMole() {
-  timerId = setInterval(randomSquare, 500);
-}
+    squares.forEach(square => {
+      square.addEventListener('mousedown', () => {
+        if (square.id == hitPosition) {
+          result++;
+          score.textContent = result;
+          hitPosition = null;
+        }
+      });
+    });
 
-moveMole();
+    function startGame(speed) {
+      clearInterval(moleTimer);
+      clearInterval(countDownTimerId);
 
-function countDown() {
-  currentTime--;
-  timeLeft.textContent = currentTime;
+      result = 0;
+      score.textContent = result;
+      currentTime = 60;
+      timeLeft.textContent = currentTime;
 
-  if (currentTime == 0) {
-    clearInterval(countDownTimerId);
-    clearInterval(timerId);
-    alert('GAME OVER! Your final score is ' + result);
-  }
-}
+      moleSpeed = speed;
+      moleTimer = setInterval(randomSquare, moleSpeed);
+      countDownTimerId = setInterval(countDown, 1000);
+    }
 
-let countDownTimerId = setInterval(countDown, 1000);
+    function countDown() {
+      currentTime--;
+      timeLeft.textContent = currentTime;
+
+      if (currentTime === 0) {
+        clearInterval(countDownTimerId);
+        clearInterval(moleTimer);
+        alert('GAME OVER! Your final score is ' + result);
+      }
+    }
   </script>
 </body>
 </html>

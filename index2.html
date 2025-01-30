@@ -6,40 +6,63 @@
   <title>Memory Game</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Arial', sans-serif;
       text-align: center;
       margin: 0;
       padding: 20px;
-      background-color: #f4f4f4;
+      background-color: #6f7685;
+      color: #f4f4f4;
     }
 
     h1 {
       margin-bottom: 10px;
+      font-size: 2.5rem;
+    }
+
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
     }
 
     #grid {
       display: grid;
-      grid-template-columns: repeat(4, 100px);
-      grid-gap: 10px;
+      grid-template-columns: repeat(6, 100px);
+      grid-gap: 15px;
       justify-content: center;
+      margin: 0 auto;
     }
 
     .card {
       width: 100px;
       height: 100px;
-      background-color: #ccc;
-      border-radius: 5px;
+      background-color: #444;
+      border-radius: 10px;
       cursor: pointer;
+      position: relative;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      transform: scale(1);
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
     }
 
     .card img {
       width: 100%;
       height: 100%;
-      display: none; /* Initially hidden */
+      display: none;
+      border-radius: 10px;
     }
 
     .card.flipped img {
-      display: block; /* Shown when flipped */
+      display: block;
+    }
+
+    footer {
+      margin-top: 30px;
+      font-size: 1rem;
+      color: #bbb;
     }
   </style>
 </head>
@@ -47,18 +70,27 @@
   <h1>Memory Game</h1>
   <p>Score: <span id="score">0</span></p>
   <div id="grid"></div>
+  <footer>&copy; 2025 Memory Game Inc.</footer>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const cards = [
-        { name: "apple", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgwL-h1Cn63ReEOujy9nt-mvu34yGszMsTJw&s" },
-        { name: "apple", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgwL-h1Cn63ReEOujy9nt-mvu34yGszMsTJw&s" },
-        { name: "banana", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlx0r1O5yAEDbejufR_PdCXVckyGdD-8F4WA&s"},
-        { name: "banana", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlx0r1O5yAEDbejufR_PdCXVckyGdD-8F4WA&s" },
-        { name: "cherry", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQeNxNE3kIrKNzcIxzcTp24wT46BDono9PYw&s" },
-        { name: "cherry", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQeNxNE3kIrKNzcIxzcTp24wT46BDono9PYw&s" },
-        { name: "grape", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSA79il592dciniUFuH0m4hW_OwyyLj2rxiA&s" },
-        { name: "grape", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSA79il592dciniUFuH0m4hW_OwyyLj2rxiA&s" }
+        { name: "apple", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSQEr6JusLU_nY5Arx0blXiE_BIApJp2EgvQ&s" },
+        { name: "apple", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSQEr6JusLU_nY5Arx0blXiE_BIApJp2EgvQ&s" },
+        { name: "banana", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSycxUwzx4FvlsMLj0kUQyvTctiXANStEnCQw&s" },
+        { name: "banana", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSycxUwzx4FvlsMLj0kUQyvTctiXANStEnCQw&s" },
+        { name: "cherry", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6YEo0Mj1PKXrzKR1JlcFuZkBknFlqYlk6gA&s" },
+        { name: "cherry", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6YEo0Mj1PKXrzKR1JlcFuZkBknFlqYlk6gA&s" },
+        { name: "grape", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtMGTgoC5h-o6wXIci85_4qta_O9Zd817QYg&s" },
+        { name: "grape", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtMGTgoC5h-o6wXIci85_4qta_O9Zd817QYg&s" },
+        { name: "kiwi", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSirylMIBll4tXPH6-uTFIVFQq75ZP2MgSAww&s" },
+        { name: "kiwi", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSirylMIBll4tXPH6-uTFIVFQq75ZP2MgSAww&s" },
+        { name: "orange", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXBrFss-1-7nkb1iHWPa73T0zbrlaS0K4Hjg&s" },
+        { name: "orange", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXBrFss-1-7nkb1iHWPa73T0zbrlaS0K4Hjg&s" },
+        { name: "pear", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRI8_sFt52nD6aJu2YCx05O3ekXz8tCnZ_5Aw&s" },
+        { name: "pear", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRI8_sFt52nD6aJu2YCx05O3ekXz8tCnZ_5Aw&s" },
+        { name: "watermelon", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgXle6-4jijh4NAywxtb11li4DDcKRLj159w&s" },
+        { name: "watermelon", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgXle6-4jijh4NAywxtb11li4DDcKRLj159w&s" }
       ];
 
       cards.sort(() => 0.5 - Math.random()); // Shuffle cards
@@ -96,7 +128,7 @@
           this.querySelector("img").style.display = "block";
 
           if (chosenCards.length === 2) {
-            setTimeout(checkMatch, 1000);
+            setTimeout(checkMatch, 500);
           }
         }
       }
