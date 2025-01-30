@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frogger Game</title>
+  <style>
+    /* General Styling */
+    body {
+        font-family: 'Roboto', sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        background: linear-gradient(to bottom, #74b9ff, #81ecec);
+        height: 100vh;
+        overflow: hidden;
+        color: #2d3436;
+    }
+
+    .title {
+        font-size: 36px;
+        font-weight: bold;
+        color: #fff;
+        margin-bottom: 10px;
+    }
+
+    #score {
+        font-size: 20px;
+        margin: 10px 0;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    button {
+        padding: 10px 20px;
+        font-size: 16px;
+        margin-bottom: 20px;
+        border: none;
+        border-radius: 5px;
+        background: #0984e3;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #74b9ff;
+    }
+
+    /* Game Grid */
+    .grid {
+        position: relative;
+        width: 400px;
+        height: 400px;
+        background: #2d3436;
+        display: grid;
+        grid-template-rows: repeat(5, 1fr);
+        grid-template-columns: repeat(10, 1fr);
+        border: 4px solid #636e72;
+        overflow: hidden;
+    }
+
+    .frog {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        background: #00b894;
+        border-radius: 50%;
+        bottom: 0;
+        left: 185px;
+        transition: all 0.1s ease-in-out;
+    }
+
+    .car, .log {
+        position: absolute;
+        width: 40px;
+        height: 20px;
+        background: #d63031;
+        border-radius: 5px;
+        transition: all 0.1s ease-in-out;
+    }
+
+    .car { background: #d63031; }
+    .log { background: #6c5ce7; }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1 class="title">Frogger Game</h1>
+    <div id="score">Time: <span id="timer">30</span> seconds</div>
+    <button id="start-pause">Start</button>
+    <div class="grid">
+      <div class="frog"></div>
+    </div>
+  </div>
+
+  <script>
+    const grid = document.querySelector('.grid');
+    const frog = document.querySelector('.frog');
+    const startPauseBtn = document.getElementById('start-pause');
+    const timerDisplay = document.getElementById('timer');
+
+    let cars = [];
+    let logs = [];
+    let gameInterval;
+    let countdown;
+    let timeLeft = 30;
+    let isGameRunning = false;
+    let currentScore = 0;
+    const step = 40; // Movement step size
+
+    // Create cars and logs with random speeds and positions
+    const createCarsAndLogs = () => {
+      cars = [];
+      logs = [];
+      for (let i = 0; i < 5; i++) {
+        const car = document.createElement('div');
+        car.classList.add('car');
+        car.style.top = `${i * 80}px`;
+        car.style.left = `${Math.random() * 400}px`;
+        grid.appendChild(car);
+        cars.push(car);
+
+        const log = document.createElement('div');
+        log.classList.add('log');
+        log.style.top = `${i * 80 + 40}px`;
+        log.style.left = `${Math.random() * 400}px`;
+        grid.appendChild(log);
+        logs.push(log);
+      }
+    };
+
+    // Move cars and logs smoothly across the screen
+    const moveElements = () => {
+      cars.forEach(car => {
+        car.style.left = `${(parseFloat(car.style.left) - 2 + 400) % 400}px`;
+      });
+
+      logs.forEach(log => {
+        log.style.left = `${(parseFloat(log.style.left) + 2) % 400}px`;
+      });
+    };
+
+    // Move the frog
+    const moveFrog = (e) => {
+      const frogRect = frog.getBoundingClientRect();
+      const gridRect = grid.getBoundingClientRect();
+
+      if (e.key === 'ArrowUp' && frogRect.top > gridRect.top) frog.style.top = `${frog.offsetTop - step}px`;
+      if (e.key === 'ArrowDown' && frogRect.bottom < gridRect.bottom) frog.style.top = `${frog.offsetTop + step}px`;
+      if (e.key === 'ArrowLeft' && frogRect.left > gridRect.left) frog.style.left = `${frog.offsetLeft - step}px`;
+      if (e.key === 'ArrowRight' && frogRect.right < gridRect.right) frog.style.left = `${frog.offsetLeft + step}px`;
+    };
+
+    // Check if frog hits a car or reaches the top
+    const checkWinLose = () => {
+      const frogRect = frog.getBoundingClientRect();
+
+      // Winning condition (frog reaches the top)
+      if (frog.offsetTop === 0) {
+        clearInterval(gameInterval);
+        clearInterval(countdown);
+        alert('You Win! Score: ' + currentScore);
+        resetGame();
+      }
+
+      // Collision detection with cars
+      cars.forEach(car => {
+        const carRect = car.getBoundingClientRect();
+        if (frogRect.left < carRect.right && frogRect.right > carRect.left &&
+          frogRect.top < carRect.bottom && frogRect.bottom > carRect.top) {
+          clearInterval(gameInterval);
+          clearInterval(countdown);
+          alert('Game Over! You hit a car. Score: ' + currentScore);
+          resetGame();
+        }
+      });
+    };
+
+    // Timer countdown
+    const startTimer = () => {
+      countdown = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+          clearInterval(gameInterval);
+          clearInterval(countdown);
+          alert('Game Over! Time’s up. Score: ' + currentScore);
+          resetGame();
+        }
+      }, 1000);
+    };
+
+    // Toggle game start/pause
+    const toggleGame = () => {
+      if (isGameRunning) {
+        clearInterval(gameInterval);
+        clearInterval(countdown);
+      } else {
+        createCarsAndLogs();
+        gameInterval = setInterval(() => {
+          moveElements();
+          checkWinLose();
+        }, 50);
+        startTimer();
+      }
+      isGameRunning = !isGameRunning;
+    };
+
+    // Reset game to initial state
+    const resetGame = () => {
+      timeLeft = 30;
+      currentScore = 0;
+      timerDisplay.textContent = timeLeft;
+      frog.style.top = `${grid.offsetHeight - 40}px`; // Reset frog position
+      frog.style.left = `${grid.offsetWidth / 2 - 15}px`; // Center frog
+    };
+
+    // Event listeners
+    document.addEventListener('keydown', moveFrog);
+    startPauseBtn.addEventListener('click', toggleGame);
+
+  </script>
+</body>
+</html>
