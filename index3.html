@@ -5,95 +5,120 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Whac-a-Mole</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f4f4f4;
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #e0f7fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      flex-direction: column;
+      text-align: center;
     }
 
     h2 {
-      color: #333;
+      color: #00796b;
+      font-size: 2rem;
       margin-bottom: 10px;
     }
 
-    .grid {
-      width: 450px;
-      height: 450px;
+    #game-container {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.1);
+      width: 500px;
+      text-align: center;
+    }
+
+    .level-buttons {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin: 20px auto;
-      padding: 10px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background-color: #00796b;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #004d40;
+      transform: scale(1.1);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 20px;
     }
 
     .square {
-      height: 140px;
-      width: 140px;
-      border: solid black 2px;
-      border-radius: 8px;
-      transition: 0.2s;
-      background: #eee;
+      background-color: #b2dfdb;
+      border-radius: 10px;
+      height: 130px;
+      width: 130px;
+      position: relative;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      transition: background-color 0.2s ease;
     }
 
     .square:hover {
-      background: #ddd;
-      cursor: pointer;
+      background-color: #80cbc4;
     }
 
     .mole {
-      background: #4a90e2;
+      background-color: #004d40;
       border-radius: 50%;
-      width: 80px;
-      height: 80px;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-      animation: pop 0.3s ease-in-out;
+      width: 70px;
+      height: 70px;
+      box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+      animation: pop 0.3s ease-out;
     }
 
     @keyframes pop {
-      0% { transform: scale(0); }
-      100% { transform: scale(1); }
+      0% {
+        transform: scale(0);
+      }
+      100% {
+        transform: scale(1);
+      }
     }
 
     #score, #time-left {
       font-weight: bold;
-      color: #e44d26;
+      color: #004d40;
+      font-size: 1.5rem;
     }
 
-    #game-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 30px;
+    .countdown {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-top: 10px;
+      color: #00796b;
     }
 
-    .level-buttons {
-      margin-top: 20px;
+    .level-buttons button {
+      transition: background-color 0.2s ease;
     }
 
-    button {
-      padding: 10px 15px;
-      margin: 5px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: 0.3s;
-    }
-
-    .easy { background: green; color: white; }
-    .medium { background: orange; color: white; }
-    .hard { background: red; color: white; }
-    
-    button:hover {
-      opacity: 0.8;
+    .level-buttons button:active {
+      background-color: #004d40;
     }
   </style>
 </head>
@@ -101,7 +126,7 @@
 
   <div id="game-container">
     <h2>Your score: <span id="score">0</span></h2>
-    <h2>Time Left: <span id="time-left">60</span></h2>
+    <h2>Time Left: <span id="time-left" class="countdown">60</span></h2>
 
     <div class="level-buttons">
       <button class="easy" onclick="startGame(1000)">Easy</button>
