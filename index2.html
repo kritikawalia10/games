@@ -70,7 +70,6 @@
   <h1>Memory Game</h1>
   <p>Score: <span id="score">0</span></p>
   <div id="grid"></div>
-  <footer>&copy; 2025 Memory Game Inc.</footer>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -90,7 +89,9 @@
         { name: "pear", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRI8_sFt52nD6aJu2YCx05O3ekXz8tCnZ_5Aw&s" },
         { name: "pear", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRI8_sFt52nD6aJu2YCx05O3ekXz8tCnZ_5Aw&s" },
         { name: "watermelon", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgXle6-4jijh4NAywxtb11li4DDcKRLj159w&s" },
-        { name: "watermelon", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgXle6-4jijh4NAywxtb11li4DDcKRLj159w&s" }
+        { name: "watermelon", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgXle6-4jijh4NAywxtb11li4DDcKRLj159w&s" },
+        { name: "dragon fruit", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS31IwkbLdWMoO_fAw-uMV-FQKNW5j-8L1XdQ&s" },
+        { name: "dragon fruit", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS31IwkbLdWMoO_fAw-uMV-FQKNW5j-8L1XdQ&s" }
       ];
 
       cards.sort(() => 0.5 - Math.random()); // Shuffle cards
@@ -142,8 +143,10 @@
           score++;
           scoreDisplay.textContent = score;
 
-          // Remove matched cards
-          cardsInPlay.forEach(card => card.removeEventListener("click", flipCard));
+          // Hide matched cards instead of removing them
+          cardsInPlay.forEach(card => {
+            card.style.visibility = "hidden";  // Hide the card but maintain its space
+          });
         } else {
           alert("No Match!");
           cardsInPlay.forEach(card => {
